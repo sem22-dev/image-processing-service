@@ -10,6 +10,8 @@ import path from "path"
 import uploadImage from "./uploadImage";
 import Image from "./mongodb/Image";
 import transformer from "./transformer";
+import verifyToken from "./middleware/verifyToken";
+import transformationRateLimiter from "./middleware/rateLimiter";
 
 dotenv.config();
 const app = express();
@@ -69,26 +71,7 @@ app.post('/register', async (req: Request, res: Response): Promise<void> => {
    }
 })
 
-async function verifyToken(req: Request, res: Response, next: Function): Promise<any>{
-    try {
-        const authHeader = req.headers.authorization;
 
-        if(!authHeader || !authHeader.startsWith('Bearer')){
-            return res.status(401).json({message: "No token provided"})
-        }
-
-        const token = authHeader.split(' ')[1];
-
-        const decoded = jwt.verify(token, jwt_secret_key as string);
-        (req as any).user = decoded;
-
-        next();
-
-    } catch (error) {
-        return res.status(403).json({ message: 'Invalid or expired token' });
-
-    }
-}
 
 app.post('/login', async (req, res): Promise<void> => {
     try {
@@ -175,7 +158,7 @@ app.get('/images', verifyToken, async (req: Request, res: Response): Promise<any
 })
 
 // Modify this line
-app.post('/images/:id/transform', transformer);
+app.post('/images/:id/transform', verifyToken, transformationRateLimiter, transformer);
 
 
 app.get('/', verifyToken, (req: Request, res: Response): void => {
