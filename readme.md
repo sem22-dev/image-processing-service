@@ -1,4 +1,3 @@
-
 # Image Processing Service
 
 ## Description
@@ -19,6 +18,8 @@ This is an **Image Processing Service** built with **Node.js, Express, TypeScrip
   - Add Watermarks
   - Convert formats (JPEG, PNG, etc.)
   - Apply filters (Grayscale, Sepia, etc.)
+- **Rate Limiting**
+  - Prevent excessive API requests using a rate limiter
 
 ---
 
@@ -27,6 +28,7 @@ This is an **Image Processing Service** built with **Node.js, Express, TypeScrip
 - **Database**: MongoDB (Mongoose ORM)
 - **Authentication**: JWT
 - **File Storage**: Cloudinary
+- **Security**: Rate Limiting with `express-rate-limit`
 
 ---
 
@@ -57,6 +59,8 @@ JWT_SECRET=your_jwt_secret
 CLOUDINARY_CLOUD_NAME=your_cloudinary_name
 CLOUDINARY_API_KEY=your_cloudinary_api_key
 CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+RATE_LIMIT_WINDOW=15
+RATE_LIMIT_MAX=100
 ```
 
 ### Run the server
@@ -142,4 +146,20 @@ GET /images/:id
 GET /images?page=1&limit=10
 ```
 
+---
+
+## Rate Limiting
+To prevent excessive API requests, the service uses `express-rate-limit`. The default settings allow **100 requests per 15 minutes** per IP address. You can modify these settings in the `.env` file:
+
+```env
+RATE_LIMIT_WINDOW=15   # Time window in minutes
+RATE_LIMIT_MAX=100     # Max requests per window per IP
+```
+
+If the rate limit is exceeded, the server will return a `429 Too Many Requests` response.
+
+---
+
+## License
+This project is licensed under the MIT License.
 
